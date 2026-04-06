@@ -19,6 +19,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
     public DbSet<OrderDetail> OrderDetails=> Set<OrderDetail>();
     public DbSet<Inventory> Inventories=> Set<Inventory>();
     public DbSet<Transaction> Transactions=> Set<Transaction>();
+    public DbSet<RefreshToken> RefreshTokens=> Set<RefreshToken>();
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
