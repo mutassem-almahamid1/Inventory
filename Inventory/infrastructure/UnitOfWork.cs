@@ -11,10 +11,29 @@ public class UnitOfWork : IUnitOfWork
     private IDbContextTransaction? _transaction;
     private bool _disposed;
 
+    public IProductRepository Products { get; }
+    public ICategoryRepository Categories { get; }
+    public IInventoryRepository Inventories { get; }
+    public IOrderRepository Orders { get; }
+    public IOrderDetailRepository OrderDetails { get; }
+    public ITransactionRepository Transactions { get; }
 
-    public UnitOfWork(AppDbContext context)
+    public UnitOfWork(
+        AppDbContext context,
+        IProductRepository products,
+        ICategoryRepository categories,
+        IInventoryRepository inventories,
+        IOrderRepository orders,
+        IOrderDetailRepository orderDetails,
+        ITransactionRepository transactions)
     {
         _context = context;
+        Products = products;
+        Categories = categories;
+        Inventories = inventories;
+        Orders = orders;
+        OrderDetails = orderDetails;
+        Transactions = transactions;
     }
 
 
