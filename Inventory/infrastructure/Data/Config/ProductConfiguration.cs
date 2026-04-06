@@ -21,17 +21,17 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         
     
         builder.HasOne(x => x.Category)
-            .WithMany()
+            .WithMany(c => c.Products)
             .HasForeignKey(x => x.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
     
         builder.HasOne(x => x.Inventory)
-            .WithMany()
+            .WithMany(i => i.Products)
             .HasForeignKey(x => x.InventoryId)
             .OnDelete(DeleteBehavior.Restrict);
     
         builder.HasOne(x => x.Transaction)
-            .WithMany()
+            .WithMany(t => t.Products)
             .HasForeignKey(x => x.TransactionId)
             .OnDelete(DeleteBehavior.Restrict);
             
