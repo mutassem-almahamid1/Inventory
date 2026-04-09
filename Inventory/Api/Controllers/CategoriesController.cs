@@ -17,9 +17,9 @@ namespace Api.Controllers;
 public class CategoriesController(ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult> GetAll()
+    public async Task<ActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await sender.Send(new GetAllCategoriesQuery());
+        var result = await sender.Send(new GetAllCategoriesQuery(pageNumber, pageSize));
         if (result.IsSuccess)
             return Ok(result.Value);
 

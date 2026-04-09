@@ -20,9 +20,9 @@ namespace Api.Controllers;
 public class InventoryController(ISender sender) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult> GetAll()
+    public async Task<ActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await sender.Send(new GetAllInventoryQuery());
+        var result = await sender.Send(new GetAllInventoryQuery(pageNumber, pageSize));
         if (result.IsSuccess)
             return Ok(result.Value);
 

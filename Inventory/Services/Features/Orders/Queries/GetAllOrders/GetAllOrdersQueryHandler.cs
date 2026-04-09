@@ -6,13 +6,20 @@ using Shared.Responses;
 
 namespace Services.Features.Orders.Queries.GetAllOrders;
 
-public class GetAllOrdersQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetAllOrdersQuery, Result<List<OrderResponse>>>
+public class GetAllOrdersQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetAllOrdersQuery, Result<PagedResponse<OrderResponse>>>
 {
-    public async Task<Result<List<OrderResponse>>> Handle(GetAllOrdersQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<OrderResponse>>> Handle(GetAllOrdersQuery request, CancellationToken cancellationToken)
     {
-        var orders = await unitOfWork.Orders.GetAllAsync(cancellationToken);
-        var response = orders.Select(OrderMapper.ToResponse).ToList();
+        var pagedResponse = await unitOfWork.Orders.GetPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
+        var response = pagedResponse.Data.Select(OrderMapper.ToResponse).ToList();
 
-        return Result.Success(response);
+        var result = new PagedResponse<OrderResponse>(
+            response,
+            pagedResponse.TotalCount,
+            pagedResponse.PageNumber,
+            pagedResponse.PageSize
+        );
+
+        return Result.Success(result);
     }
 }

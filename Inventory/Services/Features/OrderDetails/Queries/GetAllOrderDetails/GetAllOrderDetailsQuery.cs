@@ -4,4 +4,5 @@ using Shared.Responses;
 
 namespace Services.Features.OrderDetails.Queries.GetAllOrderDetails;
 
-public record GetAllOrderDetailsQuery : IRequest<Result<List<OrderDetailResponse>>>;
+public record GetAllOrderDetailsQuery(int PageNumber = 1, int PageSize = 10) 
+    : IRequest<Result<PagedResponse<OrderDetailResponse>>>;

@@ -7,13 +7,20 @@ using Shared.Responses;
 namespace Services.Features.Transactions.Queries.GetAllTransactions;
 
 public class GetAllTransactionsQueryHandler(IUnitOfWork unitOfWork)
-    : IRequestHandler<GetAllTransactionsQuery, Result<List<TransactionResponse>>>
+    : IRequestHandler<GetAllTransactionsQuery, Result<PagedResponse<TransactionResponse>>>
 {
-    public async Task<Result<List<TransactionResponse>>> Handle(GetAllTransactionsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<TransactionResponse>>> Handle(GetAllTransactionsQuery request, CancellationToken cancellationToken)
     {
-        var transactions = await unitOfWork.Transactions.GetAllAsync(cancellationToken);
-        var response = transactions.Select(TransactionMapper.ToResponse).ToList();
+        var pagedResponse = await unitOfWork.Transactions.GetPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
+        var response = pagedResponse.Data.Select(TransactionMapper.ToResponse).ToList();
 
-        return Result.Success(response);
+        var result = new PagedResponse<TransactionResponse>(
+            response,
+            pagedResponse.TotalCount,
+            pagedResponse.PageNumber,
+            pagedResponse.PageSize
+        );
+
+        return Result.Success(result);
     }
 }

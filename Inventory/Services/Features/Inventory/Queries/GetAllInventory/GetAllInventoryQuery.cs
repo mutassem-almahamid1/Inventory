@@ -4,4 +4,5 @@ using Shared.Responses;
 
 namespace Services.Features.Inventory.Queries.GetAllInventory;
 
-public record GetAllInventoryQuery : IRequest<Result<List<InventoryResponse>>>;
+public record GetAllInventoryQuery(int PageNumber = 1, int PageSize = 10) 
+    : IRequest<Result<PagedResponse<InventoryResponse>>>;

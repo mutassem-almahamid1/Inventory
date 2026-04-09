@@ -6,7 +6,7 @@ using Shared.Responses;
 
 namespace Services.Features.Categories.Queries.GetAllCategories;
 
-public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuery, Result<List<CategoryResponse>>>
+public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuery, Result<PagedResponse<CategoryResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -15,11 +15,18 @@ public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuer
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<Result<List<CategoryResponse>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<CategoryResponse>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
     {
-        var categories = await _unitOfWork.Categories.GetAllAsync(cancellationToken);
-        var categoryResponses = categories.Select(CategoryMapper.ToResponse).ToList();
+        var pagedResponse = await _unitOfWork.Categories.GetPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
+        var categoryResponses = pagedResponse.Data.Select(CategoryMapper.ToResponse).ToList();
         
-        return Result.Success(categoryResponses);
+        var result = new PagedResponse<CategoryResponse>(
+            categoryResponses,
+            pagedResponse.TotalCount,
+            pagedResponse.PageNumber,
+            pagedResponse.PageSize
+        );
+        
+        return Result.Success(result);
     }
 }

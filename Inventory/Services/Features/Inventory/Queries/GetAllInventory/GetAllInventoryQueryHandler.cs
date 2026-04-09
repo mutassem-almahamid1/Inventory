@@ -6,7 +6,7 @@ using Shared.Responses;
 
 namespace Services.Features.Inventory.Queries.GetAllInventory;
 
-public class GetAllInventoryQueryHandler : IRequestHandler<GetAllInventoryQuery, Result<List<InventoryResponse>>>
+public class GetAllInventoryQueryHandler : IRequestHandler<GetAllInventoryQuery, Result<PagedResponse<InventoryResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -15,12 +15,19 @@ public class GetAllInventoryQueryHandler : IRequestHandler<GetAllInventoryQuery,
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<Result<List<InventoryResponse>>> Handle(GetAllInventoryQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<InventoryResponse>>> Handle(GetAllInventoryQuery request, CancellationToken cancellationToken)
     {
-        var inventories = await _unitOfWork.Inventories.GetAllAsync(cancellationToken);
+        var pagedResponse = await _unitOfWork.Inventories.GetPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
         
-        var inventoryResponses = inventories.Select(InventoryMapper.ToResponse).ToList();
+        var inventoryResponses = pagedResponse.Data.Select(InventoryMapper.ToResponse).ToList();
         
-        return Result.Success(inventoryResponses);
+        var result = new PagedResponse<InventoryResponse>(
+            inventoryResponses,
+            pagedResponse.TotalCount,
+            pagedResponse.PageNumber,
+            pagedResponse.PageSize
+        );
+        
+        return Result.Success(result);
     }
 }
