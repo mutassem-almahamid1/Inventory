@@ -10,7 +10,6 @@ public static class ProductMapper
     {
         return new Product
         {
-            Id = Guid.NewGuid(),
             Name = request.Name,
             Description = request.Description,
             UnitPrice = request.UnitPrice,
