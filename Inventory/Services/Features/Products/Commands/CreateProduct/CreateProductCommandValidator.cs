@@ -25,24 +25,24 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
 
         
         RuleFor(p => p.Request.CategoryId)
-            .NotEmpty().WithMessage("{PropertyName} is required.")
             .MustAsync(async (categoryId, ct) =>
             {
-                return await unitOfWork.Categories.ExistsAsync(categoryId, ct);
+                if (!categoryId.HasValue) return true;
+                return await unitOfWork.Categories.ExistsAsync(categoryId.Value, ct);
             }).WithMessage("Category with this ID does not exist.");
 
         RuleFor(p => p.Request.InventoryId)
-            .NotEmpty().WithMessage("{PropertyName} is required.")
             .MustAsync(async (inventoryId, ct) =>
             {
-                return await unitOfWork.Inventories.ExistsAsync(inventoryId, ct);
+                if (!inventoryId.HasValue) return true;
+                return await unitOfWork.Inventories.ExistsAsync(inventoryId.Value, ct);
             }).WithMessage("Inventory with this ID does not exist.");
 
         RuleFor(p => p.Request.TransactionId)
-            .NotEmpty().WithMessage("{PropertyName} is required.")
             .MustAsync(async (transactionId, ct) =>
             {
-                return await unitOfWork.Transactions.ExistsAsync(transactionId, ct);
+                if (!transactionId.HasValue) return true;
+                return await unitOfWork.Transactions.ExistsAsync(transactionId.Value, ct);
             }).WithMessage("Transaction with this ID does not exist.");
     }
 }

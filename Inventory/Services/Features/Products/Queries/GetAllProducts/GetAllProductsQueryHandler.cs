@@ -6,7 +6,7 @@ using Shared.Responses;
 
 namespace Services.Features.Products.Queries.GetAllProducts;
 
-public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, Result<List<ProductResponse>>>
+public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, Result<PagedResponse<ProductResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -15,12 +15,19 @@ public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, R
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<List<ProductResponse>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResponse<ProductResponse>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
     {
-        var products = await _unitOfWork.Products.GetAllAsync(cancellationToken);
+        var pagedResponse = await _unitOfWork.Products.GetPagedAsync(request.PageNumber, request.PageSize, cancellationToken);
 
-        var productResponses = products.Select(ProductMapper.ToResponse).ToList();
+        var productResponses = pagedResponse.Data.Select(ProductMapper.ToResponse).ToList();
         
-        return Result.Success(productResponses);
+        var response = new PagedResponse<ProductResponse>(
+            productResponses,
+            pagedResponse.TotalCount,
+            pagedResponse.PageNumber,
+            pagedResponse.PageSize
+        );
+        
+        return Result.Success(response);
     }
 }
