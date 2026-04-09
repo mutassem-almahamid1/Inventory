@@ -38,7 +38,6 @@ public class IdentityService(
 
         var user = new ApplicationUser
         {
-            Id = Guid.NewGuid(),
             UserName = userName.Trim(),
             FullName = fullName.Trim(),
             Email = email.Trim(),
