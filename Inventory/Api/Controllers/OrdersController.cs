@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Abstractions.Security;
 using Services.Features.Orders.Commands.CreateOrder;
 using Services.Features.Orders.Commands.DeleteOrder;
 using Services.Features.Orders.Commands.UpdateOrder;
@@ -17,6 +18,7 @@ namespace Api.Controllers;
 public class OrdersController(ISender sender) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
         var result = await sender.Send(new GetAllOrdersQuery(pageNumber, pageSize));
@@ -47,6 +49,7 @@ public class OrdersController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager},{SecurityRoles.Employee}")]
     public async Task<ActionResult> Create([FromBody] CreateOrderRequest request)
     {
         var result = await sender.Send(new CreateOrderCommand(request));
@@ -57,6 +60,7 @@ public class OrdersController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateOrderRequest request)
     {
         var result = await sender.Send(new UpdateOrderCommand(id, request));
@@ -67,6 +71,7 @@ public class OrdersController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = SecurityRoles.Admin)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await sender.Send(new DeleteOrderCommand(id));

@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Abstractions.Security;
 using Services.Features.Products.Commands.CreateProduct;
 using Services.Features.Products.Commands.DeleteProduct;
 using Services.Features.Products.Commands.UpdateProduct;
@@ -81,6 +82,7 @@ public class ProductsController(ISender sender) : ControllerBase
     }
 
     [HttpGet("top-profitable/{count:int}")]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> GetTopProfitable(int count)
     {
         var result = await sender.Send(new GetTopProfitableProductsQuery(count));
@@ -91,6 +93,7 @@ public class ProductsController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> Create([FromBody] CreateProductRequest request)
     {
         var result = await sender.Send(new CreateProductCommand(request));
@@ -101,6 +104,7 @@ public class ProductsController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateProductRequest request)
     {
         var result = await sender.Send(new UpdateProductCommand(id, request));
@@ -111,6 +115,7 @@ public class ProductsController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = SecurityRoles.Admin)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await sender.Send(new DeleteProductCommand(id));

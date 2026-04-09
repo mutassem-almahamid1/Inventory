@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Abstractions.Security;
 using Services.Features.Categories.Commands.CreateCategory;
 using Services.Features.Categories.Commands.DeleteCategory;
 using Services.Features.Categories.Commands.UpdateCategory;
@@ -47,6 +48,7 @@ public class CategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> Create([FromBody] CreateCategoryRequest request)
     {
         var result = await sender.Send(new CreateCategoryCommand(request));
@@ -57,6 +59,7 @@ public class CategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateCategoryRequest request)
     {
         var result = await sender.Send(new UpdateCategoryCommand(id, request));
@@ -67,6 +70,7 @@ public class CategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = SecurityRoles.Admin)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await sender.Send(new DeleteCategoryCommand(id));

@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Abstractions.Security;
 using Services.Features.Inventory.Commands.CreateInventory;
 using Services.Features.Inventory.Commands.DeleteInventory;
 using Services.Features.Inventory.Commands.UpdateInventory;
@@ -70,6 +71,7 @@ public class InventoryController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> Create([FromBody] CreateInventoryRequest request)
     {
         var result = await sender.Send(new CreateInventoryCommand(request));
@@ -80,6 +82,7 @@ public class InventoryController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager}")]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateInventoryRequest request)
     {
         var result = await sender.Send(new UpdateInventoryCommand(id, request));
@@ -90,6 +93,7 @@ public class InventoryController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{inventoryId:guid}/products/{productId:guid}/quantity")]
+    [Authorize(Roles = $"{SecurityRoles.Admin},{SecurityRoles.Manager},{SecurityRoles.Employee}")]
     public async Task<ActionResult> UpdateProductQuantity(Guid inventoryId, Guid productId, [FromBody] UpdateInventoryProductQuantityRequest request)
     {
         var result = await sender.Send(new UpdateInventoryProductQuantityCommand(inventoryId, productId, request));
@@ -100,6 +104,7 @@ public class InventoryController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = SecurityRoles.Admin)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await sender.Send(new DeleteInventoryCommand(id));
