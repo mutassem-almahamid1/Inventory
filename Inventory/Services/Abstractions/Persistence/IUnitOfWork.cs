@@ -13,4 +13,10 @@ public interface IUnitOfWork : IDisposable, IAsyncDisposable
     Task BeginTransactionAsync();
     Task CommitTransactionAsync();
     Task RollbackTransactionAsync();
+    
+  
+    Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> action, CancellationToken cancellationToken = default);
+    
+  
+    Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken = default);
 }
