@@ -60,7 +60,7 @@ public static class SecurityServiceCollectionExtensions
                     ValidIssuer = jwtOptions.Issuer,
                     ValidAudience = jwtOptions.Audience,
                     IssuerSigningKey = signingKey,
-                    ClockSkew = TimeSpan.FromMinutes(1)
+                    ClockSkew = TimeSpan.FromMinutes(1) // Allows for a 1-minute difference between the server and client clocks
                 };
             });
 
