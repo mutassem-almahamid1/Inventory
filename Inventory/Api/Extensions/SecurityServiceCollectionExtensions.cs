@@ -4,6 +4,7 @@ using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using System.Text;
 
 namespace Api.Extensions;
@@ -12,14 +13,13 @@ public static class SecurityServiceCollectionExtensions
 {
     public static IServiceCollection AddSecurityServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtSection = configuration.GetSection(JwtOptions.SectionName);
-        var jwtOptions = jwtSection.Get<JwtOptions>()
+        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+
+        var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
                          ?? throw new InvalidOperationException("Jwt configuration section is missing or invalid.");
 
         if (string.IsNullOrWhiteSpace(jwtOptions.SigningKey) || jwtOptions.SigningKey.Length < 32)
             throw new InvalidOperationException("Jwt:SigningKey must be at least 32 characters.");
-
-        services.Configure<JwtOptions>(jwtSection);
 
         services
             .AddIdentityCore<ApplicationUser>(options =>

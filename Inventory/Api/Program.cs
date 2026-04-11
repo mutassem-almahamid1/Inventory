@@ -27,8 +27,7 @@ public class Program
             options.CustomSchemaIds(type => type.ToString().Replace("+", "."));
         });
 
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        builder.Services.AddInventoryDbContext(connectionString!);
+        builder.Services.AddInventoryDbContext(builder.Configuration);
         builder.Services.AddRepositories();
         builder.Services.AddApplicationServices();
 
