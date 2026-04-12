@@ -20,6 +20,7 @@ public class Program
         builder.Services.AddProblemDetails();
         builder.Services.AddEndpointsApiExplorer();
 
+        builder.Services.AddCorsServices(builder.Configuration);
         builder.Services.AddSecurityServices(builder.Configuration);
 
         builder.Services.AddSwaggerGen(options =>
@@ -31,6 +32,9 @@ public class Program
         builder.Services.AddRepositories();
         builder.Services.AddApplicationServices();
 
+        
+        
+        
         var app = builder.Build();
 
         using (var scope = app.Services.CreateScope())
@@ -51,6 +55,7 @@ public class Program
         }
 
         app.UseAuthentication();
+        app.UseCors("DefaultCorsPolicy");
         app.UseAuthorization();
 
         app.MapControllers();
