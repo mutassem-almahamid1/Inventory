@@ -13,14 +13,6 @@ public static class SecurityServiceCollectionExtensions
 {
     public static IServiceCollection AddSecurityServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
-
-        var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
-                         ?? throw new InvalidOperationException("Jwt configuration section is missing or invalid.");
-
-        if (string.IsNullOrWhiteSpace(jwtOptions.SigningKey) || jwtOptions.SigningKey.Length < 32)
-            throw new InvalidOperationException("Jwt:SigningKey must be at least 32 characters.");
-
         services
             .AddIdentityCore<ApplicationUser>(options =>
             {
@@ -39,14 +31,25 @@ public static class SecurityServiceCollectionExtensions
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddSignInManager();
+        
+        
+        
+        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
 
-        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey));
+        var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
+                         ?? throw new InvalidOperationException("Jwt configuration section is missing or invalid.");
+
+        if (string.IsNullOrWhiteSpace(jwtOptions.SigningKey) || jwtOptions.SigningKey.Length < 32)
+            throw new InvalidOperationException("Jwt:SigningKey must be at least 32 characters.");
+        
+        
 
         services
             .AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                // DefaultScheme: Acts as a default for all other schemes if they are not explicitly set. 
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
@@ -59,7 +62,7 @@ public static class SecurityServiceCollectionExtensions
                     ValidateLifetime = true,
                     ValidIssuer = jwtOptions.Issuer,
                     ValidAudience = jwtOptions.Audience,
-                    IssuerSigningKey = signingKey,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
                     ClockSkew = TimeSpan.FromMinutes(1) // Allows for a 1-minute difference between the server and client clocks
                 };
             });
