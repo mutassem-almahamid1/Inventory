@@ -21,6 +21,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
 
         builder.Services.AddCorsServices(builder.Configuration);
+        builder.Services.AddCachingServices();
         builder.Services.AddSecurityServices(builder.Configuration);
 
         builder.Services.AddSwaggerGen(options =>
