@@ -20,7 +20,26 @@ public static class InfrastructureRegistrations
         services.AddDbContext<AppDbContext>((serviceProvider, options) =>
         {
             var appOptions = serviceProvider.GetRequiredService<IOptions<AppOptions>>().Value;
-            options.UseNpgsql(appOptions.DefaultConnection);
+            options.UseNpgsql(appOptions.DefaultConnection, op =>
+            {
+                // Set how long the database command should to run before throwing a timeout timeout exception.
+                op.CommandTimeout(appOptions.CommandTimeout);
+
+                // Enable automatic retry logic on transient errors (like temporary network drops).
+                // MaxRetryCount: Maximum number of retry attempts.
+                // MaxRetryDelay: Maximum time to wait between each retry attempt.
+                // errorCodesToAdd: A list of specific Postgres error codes you want to retry on (null means standard transient errors).
+                op.EnableRetryOnFailure(
+                    maxRetryCount: appOptions.MaxRetryCount,
+                    maxRetryDelay: TimeSpan.FromSeconds(appOptions.MaxRetryDelayInSeconds),
+                    errorCodesToAdd: null);
+            });
+
+            if (appOptions.ShowDetailedErrors)
+            {
+                options.EnableDetailedErrors();
+                options.EnableSensitiveDataLogging();
+            }
         });
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();

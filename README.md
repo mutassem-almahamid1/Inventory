@@ -46,6 +46,12 @@ A personal learning project built with ASP.NET Core to practice modern backend d
 - Pagination (PagedResponse)
 - MediatR Pipeline Behaviors
 - Generic Repository with IQueryable
+- **Caching System**:
+  - In-memory caching with IMemoryCache
+  - MediatR Pipeline Behaviors for automatic caching
+  - Prefix-based cache invalidation (solves stale data in paginated queries)
+  - Cache key tracking using ConcurrentDictionary
+  - CORS configuration with environment-based policies
 
 ---
 
